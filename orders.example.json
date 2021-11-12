@@ -1,0 +1,29 @@
+[
+    {
+        "type_op": "CREATE",
+        "account_id": "1",
+        "amount": "0.00230",
+        "order_id": "1",
+        "pair": "BTC/USDC",
+        "limit_price": "63500.00",
+        "side": "SELL"
+    },
+    {
+        "type_op": "CREATE",
+        "account_id": "2",
+        "amount": "0.00230",
+        "order_id": "2",
+        "pair": "BTC/USDC",
+        "limit_price": "63500.00",
+        "side": "BUY"
+    },
+    {
+        "type_op": "CREATE",
+        "account_id": "1",
+        "amount": "0.00798",
+        "order_id": "3",
+        "pair": "BTC/USDC",
+        "limit_price": "62880.54",
+        "side": "BUY"
+    }
+]
