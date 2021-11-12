@@ -1,2 +1,5 @@
 /target
 Cargo.lock
+orderbook.json
+orders.json
+trades.json
