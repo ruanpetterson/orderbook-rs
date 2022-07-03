@@ -1,59 +1,87 @@
-use std::io;
-use std::io::prelude::*;
-use std::{fs::File, io::BufReader};
+use std::io::Read;
+use std::io::Result;
+use std::path::PathBuf;
+use std::time::Instant;
 
-use clap::{App, Arg};
-use log::{debug, info};
-use orderbook::{Order, Orderbook};
-use serde_json;
+use clap::Parser;
+use compact_str::CompactString;
 
-fn main() -> io::Result<()> {
-    env_logger::init();
+use orderbook::Engine;
+use orderbook::OrderRequest;
 
-    // CLI configuration
-    let matches = App::new("Example Orderbook")
-        .version("0.1.0")
-        .author("Ruan Petterson <ruan@ruan.eng.br>")
-        .about("The simplest orderbook implementation")
-        .arg(
-            Arg::with_name("orders")
-                .help("List of orders in JSON")
-                .takes_value(true)
-                .value_name("FILE"),
-        )
-        .get_matches();
-    let input_file = matches.value_of("orders").unwrap_or("./orders.json");
+#[derive(Parser)]
+#[clap(author, version, about)]
+struct Args {
+    #[clap(short, long, default_value = "BTC/USDC")]
+    pair: CompactString,
+    #[clap(short, long, parse(from_str), help = "Orders source")]
+    input: Option<Input>,
+    #[clap(short, long, parse(from_str), help = "Orderbook events destination")]
+    output: Option<Output>,
+}
 
-    // Reading and parsing file
-    debug!("Opening {}...", &input_file);
-    let input_file = File::open(input_file)?;
-    let mut buf_reader = BufReader::new(input_file);
-    let mut contents = String::new();
-    debug!("Reading contents..");
-    buf_reader.read_to_string(&mut contents)?;
-    let orders: Vec<Order> = serde_json::from_str(&contents).unwrap();
+fn main() -> Result<()> {
+    let args = Args::parse();
 
-    // Generating data
-    let mut orderbook = Orderbook::new();
-    let mut trades = Vec::new();
-
-    info!("Processing file...");
-    for order in orders {
-        if let Some(ref mut trade) = orderbook.transaction(order) {
-            trades.append(trade);
+    let content = match &args.input.unwrap_or_default() {
+        Input::File(path) => std::fs::read_to_string(&path)?,
+        Input::Stdin => {
+            let mut buffer = String::new();
+            std::io::stdin().read_to_string(&mut buffer)?;
+            buffer
         }
+    };
+    let orders: Vec<OrderRequest> = serde_json::from_str(&content)?;
+
+    let mut engine = Engine::new(&args.pair);
+    let mut events = Vec::with_capacity(1024);
+
+    let mut i = 0.0f64;
+    let begin = Instant::now();
+    for order in orders {
+        events.append(&mut engine.process(order));
+        i += 1.0;
     }
+    let end = Instant::now();
 
-    // Writing results
-    info!("Trying to save results...");
-    let mut orderbook_file = File::create("orderbook.json")?;
-    let mut trades_file = File::create("trades.json")?;
+    let elapsed = end - begin;
 
-    orderbook_file.write_all(serde_json::to_string_pretty(&orderbook)?.as_bytes())?;
-    trades_file.write_all(serde_json::to_string_pretty(&trades)?.as_bytes())?;
+    println!("Elapsed time: {:.2}s", elapsed.as_secs_f64());
+    println!("Total:        {}", i.round() as i64);
+    println!("Average:      {:.2} orders/s", i / elapsed.as_secs_f64());
 
-    orderbook_file.sync_all()?;
-    trades_file.sync_all()?;
+    match &args.output.unwrap_or_default() {
+        Output::Stdout => {
+            println!("{}", serde_json::to_string_pretty(&events).unwrap());
+        },
+        Output::File(..) => unimplemented!(),
+    };
 
     Ok(())
+}
+
+#[derive(Debug, Default)]
+enum Input {
+    #[default]
+    Stdin,
+    File(PathBuf),
+}
+
+impl From<&str> for Input {
+    fn from(s: &str) -> Self {
+        Input::File(s.to_owned().into())
+    }
+}
+
+#[derive(Default)]
+enum Output {
+    #[default]
+    Stdout,
+    File(PathBuf),
+}
+
+impl From<&str> for Output {
+    fn from(s: &str) -> Self {
+        Output::File(s.to_owned().into())
+    }
 }

@@ -1,0 +1,44 @@
+[
+    {
+        "id": 1,
+        "side": "ASK",
+        "status": "OPEN",
+        "amount": 100,
+        "limit_price": 66000
+    },
+    {
+        "id": 2,
+        "side": "BID",
+        "status": "OPEN",
+        "amount": 100,
+        "limit_price": 66000
+    },
+    {
+        "id": 3,
+        "side": "BID",
+        "status": "OPEN",
+        "amount": 100,
+        "limit_price": 66000
+    },
+    {
+        "id": 4,
+        "side": "ASK",
+        "status": "OPEN",
+        "amount": 200,
+        "limit_price": 66000
+    },
+    {
+        "id": 5,
+        "side": "ASK",
+        "status": "OPEN",
+        "amount": 100,
+        "limit_price": 66000
+    },
+    {
+        "id": 6,
+        "side": "BID",
+        "status": "OPEN",
+        "amount": 200,
+        "limit_price": 66000
+    }
+]

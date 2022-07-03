@@ -2,19 +2,21 @@
 
 Usage:
 
-    Example Orderbook 0.1.0
-    Ruan Petterson <ruan@ruan.eng.br>
-    The simplest orderbook implementation
+    orderbook 0.2.0
     
     USAGE:
-        orderbook [FILE]
+        orderbook [OPTIONS]
     
-    FLAGS:
-        -h, --help       Prints help information
-        -V, --version    Prints version information
-    
-    ARGS:
-        <FILE>    List of orders in JSON
+    OPTIONS:
+        -h, --help               Print help information
+        -i, --input <INPUT>      Orders source
+        -o, --output <OUTPUT>    Orderbook events destination
+        -p, --pair <PAIR>        [default: BTC/USDC]
+        -V, --version            Print version information
+
+You can run:
+
+    cargo run --release -- < orders.json
 
 Example JSON:
 
