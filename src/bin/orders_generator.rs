@@ -1,25 +1,28 @@
 use std::io::Result;
+use std::path::Path;
 
-const _N: usize = 5_000_000;
+use compact_str::{format_compact, CompactString};
+use orderbook::{OrderRequest, OrderSide};
+use rand::Rng;
+
+const N: usize = 5_000_000;
 
 fn main() -> Result<()> {
-    // TODO: Fix OrderRequest
-    /*
     let mut rng = rand::thread_rng();
     let mut orders = Vec::with_capacity(N);
 
     for i in 1..=N {
         let order = match rng.gen_range(0..2) {
             0 => OrderRequest::Delete {
-                order_id: OrderId::new(rng.gen_range(1..=i as u64)),
+                order_id: format_compact!("{}", rng.gen_range(1..=i as u64)),
             },
             _ => OrderRequest::Create {
-                account_id: rng.gen_range(1..10),
-                amount: rng.gen_range(1000..2000),
-                order_id: OrderId::new(i as u64),
+                account_id: format_compact!("{}", rng.gen_range(1..10)),
+                amount: rng.gen_range(1000..2000).into(),
+                order_id: format_compact!("{}", i as u64),
                 pair: CompactString::new_inline("BTC/USDC"),
-                limit_price: rng.gen_range(1000..2000),
-                order_side: match rng.gen_range(0..2) {
+                limit_price: rng.gen_range(1000..2000).into(),
+                side: match rng.gen_range(0..2) {
                     0 => OrderSide::Ask,
                     _ => OrderSide::Bid,
                 },
@@ -33,7 +36,6 @@ fn main() -> Result<()> {
     let path = Path::new("./orders.json");
 
     std::fs::write(&path, content)?;
-    */
 
     Ok(())
 }
