@@ -7,9 +7,9 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "UPPERCASE"))]
 pub enum OrderSide {
-    #[serde(rename = "SELL")]
+    #[serde(alias = "SELL")]
     Ask,
-    #[serde(rename = "BUY")]
+    #[serde(alias = "BUY")]
     Bid,
 }
 

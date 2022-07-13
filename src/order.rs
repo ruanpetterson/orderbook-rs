@@ -26,6 +26,7 @@ pub struct Order {
     side: OrderSide,
     limit_price: u64,
     amount: u64,
+    #[serde(default)]
     filled: u64,
     status: OrderStatus,
 }
