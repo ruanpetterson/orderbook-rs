@@ -22,6 +22,11 @@ where
             incoming_order.is_closed(),
             self.peek_mut(&incoming_order.side().opposite()),
         ) {
+            debug_assert!(
+                !top_order.is_closed(),
+                "top order cannot be closed before try to match"
+            );
+
             if let Some(trade) = incoming_order.trade(top_order) {
                 events.push(trade.into());
                 match (incoming_order.is_closed(), top_order.is_closed()) {
@@ -32,7 +37,7 @@ where
                             "Remove top order because it is completed already.",
                         );
                     }
-                    (true, false) => continue,
+                    (true, false) => break,
                     (false, false) => unreachable!(),
                 }
             } else {
