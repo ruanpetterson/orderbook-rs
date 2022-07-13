@@ -46,9 +46,9 @@ fn main() -> Result<()> {
 
     let elapsed = end - begin;
 
-    println!("Elapsed time: {:.2}s", elapsed.as_secs_f64());
-    println!("Total:        {}", i.round() as i64);
-    println!("Average:      {:.2} orders/s", i / elapsed.as_secs_f64());
+    eprintln!("Elapsed time: {:.2}s", elapsed.as_secs_f64());
+    eprintln!("Total:        {}", i.round() as i64);
+    eprintln!("Average:      {:.2} orders/s", i / elapsed.as_secs_f64());
 
     match &args.output.unwrap_or_default() {
         Output::Stdout => {
