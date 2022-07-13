@@ -26,10 +26,10 @@ fn simple_match() {
 fn orderbook() {
     let mut orderbook = Orderbook::<Order>::new(&PAIR);
 
-    assert_eq!(orderbook.matching(ORDERS[0]).len(), 0);
+    assert_eq!(orderbook.matching(ORDERS[0]).len(), 1);
     assert_eq!(orderbook.matching(ORDERS[1]).len(), 1);
-    assert_eq!(orderbook.matching(ORDERS[2]).len(), 0);
-    assert_eq!(orderbook.matching(ORDERS[3]).len(), 1);
-    assert_eq!(orderbook.matching(ORDERS[4]).len(), 0);
+    assert_eq!(orderbook.matching(ORDERS[2]).len(), 1);
+    assert_eq!(orderbook.matching(ORDERS[3]).len(), 2);
+    assert_eq!(orderbook.matching(ORDERS[4]).len(), 1);
     assert_eq!(orderbook.matching(ORDERS[5]).len(), 2);
 }

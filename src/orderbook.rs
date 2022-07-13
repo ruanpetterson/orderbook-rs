@@ -36,15 +36,31 @@ where
 pub enum OrderbookEvent<Order: Asset>
 where
     <Order as Asset>::Trade: Serialize,
+    <Order as Asset>::OrderId: Serialize,
 {
-    Added(Order),
-    Removed(Order),
+    Added(<Order as Asset>::OrderId),
+    Removed(<Order as Asset>::OrderId),
     Trade(<Order as Asset>::Trade),
 }
 
-impl<Order: Asset<Trade = Trade>> From<Trade> for OrderbookEvent<Order> {
+impl<Order> From<Trade> for OrderbookEvent<Order>
+where
+    Order: Asset<Trade = Trade>,
+    <Order as Asset>::OrderId: Serialize,
+{
     fn from(trade: Trade) -> Self {
         OrderbookEvent::Trade(trade)
+    }
+}
+
+// TODO: impl remove event as well.
+impl<Order> From<OrderId> for OrderbookEvent<Order>
+where
+    Order: Asset<OrderId = OrderId>,
+    <Order as Asset>::Trade: Serialize,
+{
+    fn from(order_id: OrderId) -> Self {
+        OrderbookEvent::Added(order_id)
     }
 }
 
@@ -54,6 +70,7 @@ where
     Order: Asset<OrderSide = OrderSide>,
     Order: Asset<Trade = Trade>,
     <Order as Asset>::OrderId: Hash,
+    <Order as Asset>::OrderId: Serialize,
 {
     type Order = Order;
     type Event = OrderbookEvent<Self::Order>;

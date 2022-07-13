@@ -1,21 +1,19 @@
 use std::hash::Hash;
 
-pub trait Exchange
-where
-    <<Self as Exchange>::Order as Asset>::OrderId: Hash,
-{
+pub trait Exchange {
     type Order: Asset;
-    type Event: From<<Self::Order as Asset>::Trade>;
+    type Event;
 
     fn insert(&mut self, order: Self::Order);
     fn remove(
         &mut self,
         order: &<Self::Order as Asset>::OrderId,
     ) -> Option<Self::Order>;
-    fn matching(
-        &mut self,
-        order: Self::Order,
-    ) -> Vec<<Self as Exchange>::Event> {
+    fn matching(&mut self, order: Self::Order) -> Vec<<Self as Exchange>::Event>
+    where
+        <Self as Exchange>::Event: From<<Self::Order as Asset>::Trade>,
+        <Self as Exchange>::Event: From<<Self::Order as Asset>::OrderId>,
+    {
         let mut events = Vec::with_capacity(8);
         let mut incoming_order = order;
         while let (false, Some(top_order)) = (
@@ -50,6 +48,7 @@ where
         // We need to check if incoming order is fullfilled. If not, we'll
         // insert it into orderbook.
         if !incoming_order.is_closed() {
+            events.push(incoming_order.id().into());
             self.insert(incoming_order);
         }
 
