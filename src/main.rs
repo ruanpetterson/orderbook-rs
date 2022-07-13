@@ -16,7 +16,12 @@ struct Args {
     pair: CompactString,
     #[clap(short, long, parse(from_str), help = "Orders source")]
     input: Option<Input>,
-    #[clap(short, long, parse(from_str), help = "Orderbook events destination")]
+    #[clap(
+        short,
+        long,
+        parse(from_str),
+        help = "Orderbook events destination"
+    )]
     output: Option<Output>,
 }
 
@@ -53,7 +58,7 @@ fn main() -> Result<()> {
     match &args.output.unwrap_or_default() {
         Output::Stdout => {
             println!("{}", serde_json::to_string_pretty(&events).unwrap());
-        },
+        }
         Output::File(..) => unimplemented!(),
     };
 
