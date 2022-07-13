@@ -7,7 +7,7 @@ where
     type Order: Asset;
     type Event: From<<Self::Order as Asset>::Trade>;
 
-    fn insert(&mut self, order: Self::Order, new: bool);
+    fn insert(&mut self, order: Self::Order);
     fn remove(
         &mut self,
         order: &<Self::Order as Asset>::OrderId,
@@ -18,35 +18,34 @@ where
     ) -> Vec<<Self as Exchange>::Event> {
         let mut events = Vec::with_capacity(8);
         let mut incoming_order = order;
-        while let (false, Some(mut top_order)) = (
+        while let (false, Some(top_order)) = (
             incoming_order.is_closed(),
-            self.pop(&incoming_order.side().opposite()),
+            self.peek_mut(&incoming_order.side().opposite()),
         ) {
-            if let Some(trade) = incoming_order.trade(&mut top_order) {
+            if let Some(trade) = incoming_order.trade(top_order) {
                 events.push(trade.into());
                 match (incoming_order.is_closed(), top_order.is_closed()) {
-                    (true, _) => {
-                        // Top order should go back if it do not become
-                        // completed
-                        if !top_order.is_closed() {
-                            self.insert(top_order, false);
-                        }
-                        break;
+                    (_, true) => {
+                        // As long as top_order is completed, we can safely
+                        // remove it from orderbook.
+                        self.pop(&incoming_order.side().opposite()).expect(
+                            "Remove top order because it is completed already.",
+                        );
                     }
-                    (false, true) => continue,
+                    (true, false) => continue,
                     (false, false) => unreachable!(),
                 }
             } else {
-                // Top order should go back if it do not become completed
-                if !top_order.is_closed() {
-                    self.insert(top_order, false);
-                }
+                // Since incoming order is not matching to top order anymore, we
+                // can move on.
                 break;
             }
         }
 
+        // We need to check if incoming order is fullfilled. If not, we'll
+        // insert it into orderbook.
         if !incoming_order.is_closed() {
-            self.insert(incoming_order, true);
+            self.insert(incoming_order);
         }
 
         events
@@ -55,6 +54,10 @@ where
         &self,
         side: &<Self::Order as Asset>::OrderSide,
     ) -> Option<&Self::Order>;
+    fn peek_mut(
+        &mut self,
+        side: &<Self::Order as Asset>::OrderSide,
+    ) -> Option<&mut Self::Order>;
     fn pop(
         &mut self,
         side: &<Self::Order as Asset>::OrderSide,

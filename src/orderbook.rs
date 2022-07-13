@@ -58,7 +58,7 @@ where
     type Order = Order;
     type Event = OrderbookEvent<Self::Order>;
 
-    fn insert(&mut self, order: Self::Order, new: bool) {
+    fn insert(&mut self, order: Self::Order) {
         let level = match order.side() {
             OrderSide::Ask => self
                 .ask
@@ -70,11 +70,7 @@ where
                 .or_insert_with(|| VecDeque::with_capacity(8)),
         };
 
-        if new {
-            level.push_back(order.id());
-        } else {
-            level.push_front(order.id());
-        }
+        level.push_back(order.id());
 
         self.orders.insert(order.id(), order);
     }
@@ -108,6 +104,19 @@ where
         }
         .front()?;
         self.orders.get(order_id)
+    }
+
+    fn peek_mut(&mut self, side: &OrderSide) -> Option<&mut Self::Order> {
+        let order_id = match side {
+            OrderSide::Ask => {
+                self.ask.first_key_value().map(|(_, level)| level)?
+            }
+            OrderSide::Bid => {
+                self.bid.first_key_value().map(|(_, level)| level)?
+            }
+        }
+        .front()?;
+        self.orders.get_mut(order_id)
     }
 
     fn pop(&mut self, side: &OrderSide) -> Option<Self::Order> {
