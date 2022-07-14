@@ -4,6 +4,13 @@ use compact_str::CompactString;
 use rust_decimal::{prelude::ToPrimitive, Decimal};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum OrderRequestError {
+    #[error("order type mismatch")]
+    MismatchType
+}
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(tag = "type_op", rename_all = "UPPERCASE"))]
@@ -22,7 +29,7 @@ pub enum OrderRequest {
 }
 
 impl TryFrom<OrderRequest> for Order {
-    type Error = OrderError;
+    type Error = OrderRequestError;
 
     fn try_from(order_request: OrderRequest) -> Result<Self, Self::Error> {
         match order_request {
@@ -42,7 +49,7 @@ impl TryFrom<OrderRequest> for Order {
                 amount.trunc().to_u64().unwrap() * 100
                     + amount.fract().to_u64().unwrap(),
             )),
-            OrderRequest::Delete { order_id } => Err(OrderError::MismatchSide),
+            OrderRequest::Delete { order_id } => Err(OrderRequestError::MismatchType),
         }
     }
 }
