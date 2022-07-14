@@ -5,12 +5,14 @@ pub struct Engine {
 }
 
 impl Engine {
+    #[inline]
     pub fn new(pair: &str) -> Self {
         Self {
             orderbook: Orderbook::new(pair),
         }
     }
 
+    #[inline]
     pub fn process(
         &mut self,
         incoming_order: OrderRequest,

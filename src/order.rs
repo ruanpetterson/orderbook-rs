@@ -124,7 +124,7 @@ impl Asset for Order {
 
     #[inline]
     fn trade(&mut self, other: &mut Self) -> Option<Self::Trade> {
-        #[inline]
+        #[inline(always)]
         fn matches_with(taker: &Order, maker: &Order) -> bool {
             match (taker.side(), maker.side()) {
                 (OrderSide::Ask, OrderSide::Bid) => {
@@ -137,7 +137,7 @@ impl Asset for Order {
             }
         }
 
-        #[inline]
+        #[inline(always)]
         fn subtract_amount(order: &mut Order, exchanged: u64) {
             debug_assert!(
                 order.remaining() >= exchanged,
@@ -190,6 +190,7 @@ pub struct BidOrder(Order);
 impl TryFrom<Order> for AskOrder {
     type Error = OrderError;
 
+    #[inline]
     fn try_from(order: Order) -> Result<Self, Self::Error> {
         order
             .side()
@@ -202,6 +203,7 @@ impl TryFrom<Order> for AskOrder {
 impl TryFrom<Order> for BidOrder {
     type Error = OrderError;
 
+    #[inline]
     fn try_from(order: Order) -> Result<Self, Self::Error> {
         order
             .side()
@@ -228,12 +230,14 @@ impl From<BidOrder> for Order {
 impl Deref for AskOrder {
     type Target = Order;
 
+    #[inline]
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
 impl DerefMut for AskOrder {
+    #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
@@ -242,12 +246,14 @@ impl DerefMut for AskOrder {
 impl Deref for BidOrder {
     type Target = Order;
 
+    #[inline]
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
 impl DerefMut for BidOrder {
+    #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }

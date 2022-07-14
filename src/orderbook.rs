@@ -22,6 +22,7 @@ impl<Order> Orderbook<Order>
 where
     Order: Asset,
 {
+    #[inline]
     pub fn new(pair: &str) -> Self {
         Self {
             pair: CompactString::new_inline(pair),
@@ -48,6 +49,7 @@ where
     Order: Asset<Trade = Trade>,
     <Order as Asset>::OrderId: Serialize,
 {
+    #[inline]
     fn from(trade: Trade) -> Self {
         OrderbookEvent::Trade(trade)
     }
@@ -59,6 +61,7 @@ where
     Order: Asset<OrderId = OrderId>,
     <Order as Asset>::Trade: Serialize,
 {
+    #[inline]
     fn from(order_id: OrderId) -> Self {
         OrderbookEvent::Added(order_id)
     }
@@ -75,6 +78,7 @@ where
     type Order = Order;
     type Event = OrderbookEvent<Self::Order>;
 
+    #[inline]
     fn insert(&mut self, order: Self::Order) {
         let level = match order.side() {
             OrderSide::Ask => self
@@ -92,6 +96,7 @@ where
         self.orders.insert(order.id(), order);
     }
 
+    #[inline]
     fn remove(
         &mut self,
         order_id: &<Self::Order as Asset>::OrderId,
@@ -110,6 +115,7 @@ where
         Some(order)
     }
 
+    #[inline]
     fn peek(&self, side: &OrderSide) -> Option<&Self::Order> {
         let order_id = match side {
             OrderSide::Ask => {
@@ -123,6 +129,7 @@ where
         self.orders.get(order_id)
     }
 
+    #[inline]
     fn peek_mut(&mut self, side: &OrderSide) -> Option<&mut Self::Order> {
         let order_id = match side {
             OrderSide::Ask => {
@@ -136,6 +143,7 @@ where
         self.orders.get_mut(order_id)
     }
 
+    #[inline]
     fn pop(&mut self, side: &OrderSide) -> Option<Self::Order> {
         let order_id = match side {
             OrderSide::Ask => {
