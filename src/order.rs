@@ -155,7 +155,7 @@ impl Asset for Order {
             let exchanged = self.remaining().min(other.remaining());
             let price = match self.side() {
                 OrderSide::Ask => self.limit_price().max(other.limit_price()),
-                OrderSide::Bid => self.limit_price().max(other.limit_price()),
+                OrderSide::Bid => self.limit_price().min(other.limit_price()),
             };
             subtract_amount(self, exchanged);
             subtract_amount(other, exchanged);
