@@ -1,6 +1,5 @@
 use compact_str::CompactString;
 use once_cell::sync::Lazy;
-use serde::{Deserialize, Serialize};
 
 use crate::engine::{Event, Order, Trade};
 use crate::{Asset, Exchange, Orderbook};

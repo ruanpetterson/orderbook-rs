@@ -1,5 +1,3 @@
-use std::hash::Hash;
-
 pub trait Exchange {
     type Order: Asset;
     type Event: ExchangeEvent<Order = Self::Order>;

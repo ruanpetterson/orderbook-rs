@@ -1,19 +1,17 @@
-use std::borrow::Borrow;
 use std::cmp::Reverse;
 use std::collections::{BTreeMap, VecDeque};
-use std::fmt::Debug;
+
 use std::hash::Hash;
 use std::marker::PhantomData;
 
 use compact_str::CompactString;
 use indexmap::IndexMap;
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
 
 use crate::internals::ExchangeExt;
-use crate::{Asset, Exchange, ExchangeEvent, Opposite, OrderSide};
+use crate::{Asset, Exchange, ExchangeEvent, OrderSide};
 
 pub struct Orderbook<Order: Asset, Event, Trade> {
+    #[allow(dead_code)]
     pair: CompactString,
     orders: IndexMap<<Order as Asset>::OrderId, Order>,
     ask: BTreeMap<u64, VecDeque<<Order as Asset>::OrderId>>,

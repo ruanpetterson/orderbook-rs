@@ -5,7 +5,6 @@ use std::ops::{Deref, DerefMut};
 use super::{OrderId, OrderStatus, Trade};
 use crate::{Asset, OrderSide};
 
-use compact_str::CompactString;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use thiserror::Error;

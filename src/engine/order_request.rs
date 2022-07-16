@@ -50,9 +50,7 @@ impl TryFrom<OrderRequest> for Order {
                 amount.trunc().to_u64().unwrap() * 100
                     + amount.fract().to_u64().unwrap(),
             )),
-            OrderRequest::Delete { .. } => {
-                Err(OrderRequestError::MismatchType)
-            }
+            OrderRequest::Delete { .. } => Err(OrderRequestError::MismatchType),
         }
     }
 }

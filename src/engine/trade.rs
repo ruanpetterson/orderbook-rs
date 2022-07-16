@@ -1,6 +1,6 @@
 use crate::Asset;
 
-use super::{Order, OrderId};
+use super::OrderId;
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
