@@ -76,7 +76,7 @@ pub trait ExchangeEvent {
 
 pub trait Asset<Order = Self>: Ord + Eq {
     /// Order unique identifier.
-    type OrderId: Eq + Copy + Clone;
+    type OrderId: Copy + Clone + Eq;
     /// Order current status.
     type OrderStatus: Eq + Copy + Clone;
     /// Order side.
