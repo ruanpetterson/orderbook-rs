@@ -126,6 +126,8 @@ impl Asset for Order {
 
     #[inline]
     fn trade(&mut self, other: &mut Self) -> Option<Self::Trade> {
+        let (taker, maker) = (self, other);
+
         #[inline(always)]
         fn matches_with(taker: &Order, maker: &Order) -> bool {
             match (taker.side(), maker.side()) {
@@ -153,18 +155,18 @@ impl Asset for Order {
             }
         }
 
-        matches_with(self, other).then(|| {
-            let exchanged = self.remaining().min(other.remaining());
-            let price = match self.side() {
-                OrderSide::Ask => self.limit_price().max(other.limit_price()),
-                OrderSide::Bid => self.limit_price().min(other.limit_price()),
+        matches_with(taker, maker).then(|| {
+            let exchanged = taker.remaining().min(maker.remaining());
+            let price = match taker.side() {
+                OrderSide::Ask => taker.limit_price().max(maker.limit_price()),
+                OrderSide::Bid => taker.limit_price().min(maker.limit_price()),
             };
-            subtract_amount(self, exchanged);
-            subtract_amount(other, exchanged);
+            subtract_amount(taker, exchanged);
+            subtract_amount(maker, exchanged);
 
             Trade {
-                taker: self.id,
-                maker: other.id,
+                taker: taker.id,
+                maker: maker.id,
                 amount: exchanged,
                 price,
             }
