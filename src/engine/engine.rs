@@ -1,7 +1,8 @@
-use crate::{Asset, Exchange, Order, OrderId, OrderRequest, Orderbook};
+use super::{Event, Order, OrderId, OrderRequest, Trade};
+use crate::{Asset, Exchange, ExchangeEvent, Orderbook};
 
 pub struct Engine {
-    orderbook: Orderbook<Order>,
+    orderbook: Orderbook<Order, Event<Order>, Trade>,
 }
 
 impl Engine {
@@ -16,7 +17,7 @@ impl Engine {
     pub fn process(
         &mut self,
         incoming_order: OrderRequest,
-    ) -> Vec<<Orderbook<Order> as Exchange>::Event> {
+    ) -> Vec<<Orderbook<Order, Event<Order>, Trade> as Exchange>::Event> {
         let mut events = Vec::with_capacity(8);
         match incoming_order {
             OrderRequest::Create { .. } => {

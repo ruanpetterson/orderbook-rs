@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 pub struct OrderId(u64);
 
 impl OrderId {
+    #[inline]
     pub fn new(order_id: u64) -> Self {
         Self(order_id)
     }

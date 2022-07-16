@@ -3,22 +3,25 @@ use std::cmp::Reverse;
 use std::collections::{BTreeMap, VecDeque};
 use std::fmt::Debug;
 use std::hash::Hash;
+use std::marker::PhantomData;
 
 use compact_str::CompactString;
 use indexmap::IndexMap;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use crate::{Asset, Exchange, Opposite, Order, OrderId, OrderSide, Trade};
+use crate::{Asset, Exchange, ExchangeEvent, Opposite, OrderSide};
 
-pub struct Orderbook<Order: Asset> {
+pub struct Orderbook<Order: Asset, Event, Trade> {
     pair: CompactString,
     orders: IndexMap<<Order as Asset>::OrderId, Order>,
     ask: BTreeMap<u64, VecDeque<<Order as Asset>::OrderId>>,
     bid: BTreeMap<Reverse<u64>, VecDeque<<Order as Asset>::OrderId>>,
+    _event: PhantomData<Event>,
+    _trade: PhantomData<Trade>,
 }
 
-impl<Order> Orderbook<Order>
+impl<Order, Event, Trade> Orderbook<Order, Event, Trade>
 where
     Order: Asset,
 {
@@ -29,54 +32,21 @@ where
             orders: IndexMap::new(),
             ask: BTreeMap::new(),
             bid: BTreeMap::new(),
+            _event: PhantomData,
+            _trade: PhantomData,
         }
     }
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize))]
-pub enum OrderbookEvent<Order: Asset>
+impl<Order, Event, Trade> Exchange for Orderbook<Order, Event, Trade>
 where
-    <Order as Asset>::Trade: Serialize,
-    <Order as Asset>::OrderId: Serialize,
-{
-    Added(<Order as Asset>::OrderId),
-    Removed(<Order as Asset>::OrderId),
-    Trade(<Order as Asset>::Trade),
-}
-
-impl<Order> From<Trade> for OrderbookEvent<Order>
-where
-    Order: Asset<Trade = Trade>,
-    <Order as Asset>::OrderId: Serialize,
-{
-    #[inline]
-    fn from(trade: Trade) -> Self {
-        OrderbookEvent::Trade(trade)
-    }
-}
-
-// TODO: impl remove event as well.
-impl<Order> From<OrderId> for OrderbookEvent<Order>
-where
-    Order: Asset<OrderId = OrderId>,
-    <Order as Asset>::Trade: Serialize,
-{
-    #[inline]
-    fn from(order_id: OrderId) -> Self {
-        OrderbookEvent::Added(order_id)
-    }
-}
-
-impl<Order> Exchange for Orderbook<Order>
-where
-    Order: Debug,
     Order: Asset<OrderSide = OrderSide>,
     Order: Asset<Trade = Trade>,
     <Order as Asset>::OrderId: Hash,
-    <Order as Asset>::OrderId: Serialize,
+    Event: ExchangeEvent<Order = Order>,
 {
     type Order = Order;
-    type Event = OrderbookEvent<Self::Order>;
+    type Event = Event;
 
     #[inline]
     fn insert(&mut self, order: Self::Order) {

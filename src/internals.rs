@@ -2,18 +2,14 @@ use std::hash::Hash;
 
 pub trait Exchange {
     type Order: Asset;
-    type Event;
+    type Event: ExchangeEvent<Order = Self::Order>;
 
     fn insert(&mut self, order: Self::Order);
     fn remove(
         &mut self,
         order: &<Self::Order as Asset>::OrderId,
     ) -> Option<Self::Order>;
-    fn matching(&mut self, order: Self::Order) -> Vec<<Self as Exchange>::Event>
-    where
-        <Self as Exchange>::Event: From<<Self::Order as Asset>::Trade>,
-        <Self as Exchange>::Event: From<<Self::Order as Asset>::OrderId>,
-    {
+    fn matching(&mut self, order: Self::Order) -> Vec<Self::Event> {
         let mut events = Vec::with_capacity(8);
         let mut incoming_order = order;
         while let (false, Some(top_order)) = (
@@ -26,7 +22,7 @@ pub trait Exchange {
             );
 
             if let Some(trade) = incoming_order.trade(top_order) {
-                events.push(trade.into());
+                events.push(Self::Event::traded(trade));
                 match (incoming_order.is_closed(), top_order.is_closed()) {
                     (_, true) => {
                         // As long as top_order is completed, we can safely
@@ -48,7 +44,7 @@ pub trait Exchange {
         // We need to check if incoming order is fullfilled. If not, we'll
         // insert it into orderbook.
         if !incoming_order.is_closed() {
-            events.push(incoming_order.id().into());
+            events.push(Self::Event::added(incoming_order.id()));
             self.insert(incoming_order);
         }
 
@@ -66,6 +62,13 @@ pub trait Exchange {
         &mut self,
         side: &<Self::Order as Asset>::OrderSide,
     ) -> Option<Self::Order>;
+}
+
+pub trait ExchangeEvent {
+    type Order: Asset;
+    fn added(order_id: <Self::Order as Asset>::OrderId) -> Self;
+    fn removed(order_id: <Self::Order as Asset>::OrderId) -> Self;
+    fn traded(trade: <Self::Order as Asset>::Trade) -> Self;
 }
 
 pub trait Asset<Order = Self>: Ord + Eq {

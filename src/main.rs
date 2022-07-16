@@ -6,8 +6,8 @@ use std::time::Instant;
 use clap::Parser;
 use compact_str::CompactString;
 
-use orderbook::Engine;
-use orderbook::OrderRequest;
+use orderbook::engine::Engine;
+use orderbook::engine::OrderRequest;
 
 #[derive(Parser)]
 #[clap(author, version, about)]
@@ -57,7 +57,7 @@ fn main() -> Result<()> {
 
     match &args.output.unwrap_or_default() {
         Output::Stdout => {
-            println!("{}", serde_json::to_string_pretty(&events).unwrap());
+            // TODO: impl serde feature
         }
         Output::File(..) => unimplemented!(),
     };

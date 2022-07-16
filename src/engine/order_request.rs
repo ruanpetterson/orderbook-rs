@@ -1,4 +1,5 @@
-use crate::{order::OrderError, Order, OrderId, OrderSide, OrderStatus, Trade};
+use super::{Order, OrderId, OrderStatus, Trade};
+use crate::OrderSide;
 
 use compact_str::CompactString;
 use rust_decimal::{prelude::ToPrimitive, Decimal};
@@ -9,7 +10,7 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum OrderRequestError {
     #[error("order type mismatch")]
-    MismatchType
+    MismatchType,
 }
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -31,6 +32,7 @@ pub enum OrderRequest {
 impl TryFrom<OrderRequest> for Order {
     type Error = OrderRequestError;
 
+    #[inline]
     fn try_from(order_request: OrderRequest) -> Result<Self, Self::Error> {
         match order_request {
             OrderRequest::Create {
@@ -49,7 +51,9 @@ impl TryFrom<OrderRequest> for Order {
                 amount.trunc().to_u64().unwrap() * 100
                     + amount.fract().to_u64().unwrap(),
             )),
-            OrderRequest::Delete { order_id } => Err(OrderRequestError::MismatchType),
+            OrderRequest::Delete { order_id } => {
+                Err(OrderRequestError::MismatchType)
+            }
         }
     }
 }

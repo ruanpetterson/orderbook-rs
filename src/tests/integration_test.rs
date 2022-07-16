@@ -2,7 +2,8 @@ use compact_str::CompactString;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
-use crate::{Asset, Exchange, Order, Orderbook};
+use crate::engine::{Event, Order, Trade};
+use crate::{Asset, Exchange, Orderbook};
 
 const PAIR: CompactString = CompactString::new_inline("BTC/USDC");
 const MOCK_SIZE: usize = 6;
@@ -24,7 +25,7 @@ fn simple_match() {
 
 #[test]
 fn orderbook() {
-    let mut orderbook = Orderbook::<Order>::new(&PAIR);
+    let mut orderbook = Orderbook::<Order, Event<Order>, Trade>::new(&PAIR);
 
     assert_eq!(orderbook.matching(ORDERS[0]).len(), 1);
     assert_eq!(orderbook.matching(ORDERS[1]).len(), 1);

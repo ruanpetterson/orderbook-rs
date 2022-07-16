@@ -2,9 +2,8 @@ use std::borrow::Borrow;
 use std::cmp::{Ordering, Reverse};
 use std::ops::{Deref, DerefMut};
 
-use crate::Asset;
-
-use crate::{OrderId, OrderSide, OrderStatus, Trade};
+use super::{OrderId, OrderStatus, Trade};
+use crate::{Asset, OrderSide};
 
 use compact_str::CompactString;
 #[cfg(feature = "serde")]
@@ -26,12 +25,13 @@ pub struct Order {
     side: OrderSide,
     limit_price: u64,
     amount: u64,
-    #[serde(default)]
+    #[cfg_attr(feature = "serde", serde(default))]
     filled: u64,
     status: OrderStatus,
 }
 
 impl Order {
+    #[inline]
     pub fn new(
         id: OrderId,
         account_id: u64,
@@ -59,6 +59,7 @@ impl Borrow<Order> for Reverse<Order> {
 }
 
 impl PartialEq for Order {
+    #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.id.eq(&other.id)
     }
@@ -66,12 +67,14 @@ impl PartialEq for Order {
 impl Eq for Order {}
 
 impl PartialOrd for Order {
+    #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
 impl Ord for Order {
+    #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         if self.id.eq(&other.id) {
             Ordering::Equal
