@@ -68,25 +68,16 @@ where
     #[inline]
     fn remove(
         &mut self,
-        order_id: &<Self::Order as Asset>::OrderId,
+        _order_id: &<Self::Order as Asset>::OrderId,
     ) -> Option<Self::Order> {
-        let mut order = self.orders.remove(order_id)?;
-        let level = match order.side() {
-            OrderSide::Ask => self.ask.get_mut(&order.limit_price())?,
-            OrderSide::Bid => {
-                self.bid.get_mut(&Reverse(order.limit_price()))?
-            }
-        };
-        let index = level.iter().position(|&o| o == order.id())?;
-        level.remove(index);
-
-        order.cancel();
-        Some(order)
+        // TODO: implement a way to remove orders. It should not let dangling
+        // levels (level with no orders).
+        todo!()
     }
 
     #[inline]
     fn peek(&self, side: &OrderSide) -> Option<&Self::Order> {
-        let order_id = match side {
+        match side {
             OrderSide::Ask => {
                 self.ask.first_key_value().map(|(_, level)| level)?
             }
@@ -94,13 +85,14 @@ where
                 self.bid.first_key_value().map(|(_, level)| level)?
             }
         }
-        .front()?;
-        self.orders.get(order_id)
+        .front()
+        .map(|order_id| self.orders.get(order_id))
+        .flatten()
     }
 
     #[inline]
     fn peek_mut(&mut self, side: &OrderSide) -> Option<&mut Self::Order> {
-        let order_id = match side {
+        match side {
             OrderSide::Ask => {
                 self.ask.first_key_value().map(|(_, level)| level)?
             }
@@ -108,15 +100,17 @@ where
                 self.bid.first_key_value().map(|(_, level)| level)?
             }
         }
-        .front()?;
-        self.orders.get_mut(order_id)
+        .front()
+        .map(|order_id| self.orders.get_mut(order_id))
+        .flatten()
     }
 
     #[inline]
     fn pop(&mut self, side: &OrderSide) -> Option<Self::Order> {
-        let order_id = match side {
+        match side {
             OrderSide::Ask => {
                 let mut level = self.ask.first_entry()?;
+                // It prevents dagling levels (level with no orders).
                 if level.get().len() == 1 {
                     level.remove().pop_front()
                 } else {
@@ -125,14 +119,16 @@ where
             }
             OrderSide::Bid => {
                 let mut level = self.bid.first_entry()?;
+                // It prevents dagling levels (level with no orders).
                 if level.get().len() == 1 {
                     level.remove().pop_front()
                 } else {
                     level.get_mut().pop_front()
                 }
             }
-        }?;
-        self.orders.remove(&order_id)
+        }
+        .map(|order_id| self.orders.remove(&order_id))
+        .flatten()
     }
 }
 
