@@ -6,7 +6,7 @@
 mod tests;
 
 mod internals;
-pub use crate::internals::{Asset, Exchange, ExchangeEvent, Opposite};
+pub use crate::internals::{Asset, Exchange, ExchangeExt, ExchangeEvent, Opposite};
 
 mod order_side;
 pub use crate::order_side::OrderSide;

@@ -1,5 +1,5 @@
 use super::{Event, Order, OrderId, OrderRequest, Trade};
-use crate::{Asset, Exchange, ExchangeEvent, Orderbook};
+use crate::{Exchange, Orderbook};
 
 pub struct Engine {
     orderbook: Orderbook<Order, Event<Order>, Trade>,
@@ -33,5 +33,10 @@ impl Engine {
 
         // TODO: Generate events
         events
+    }
+
+    #[inline]
+    pub fn orderbook(&self) -> &Orderbook<Order, Event<Order>, Trade> {
+        &self.orderbook
     }
 }

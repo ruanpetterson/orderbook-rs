@@ -64,6 +64,11 @@ pub trait Exchange {
     ) -> Option<Self::Order>;
 }
 
+pub trait ExchangeExt: Exchange {
+    fn spread(&self) -> Option<(u64, u64)>;
+    fn len(&self) -> (usize, usize);
+}
+
 pub trait ExchangeEvent {
     type Order: Asset;
     fn added(order_id: <Self::Order as Asset>::OrderId) -> Self;

@@ -1,4 +1,4 @@
-use super::{Order, OrderId, OrderStatus, Trade};
+use super::{Order, OrderId};
 use crate::OrderSide;
 
 use compact_str::CompactString;
@@ -38,7 +38,6 @@ impl TryFrom<OrderRequest> for Order {
             OrderRequest::Create {
                 account_id,
                 amount,
-                order_id,
                 limit_price,
                 side,
                 ..
@@ -51,7 +50,7 @@ impl TryFrom<OrderRequest> for Order {
                 amount.trunc().to_u64().unwrap() * 100
                     + amount.fract().to_u64().unwrap(),
             )),
-            OrderRequest::Delete { order_id } => {
+            OrderRequest::Delete { .. } => {
                 Err(OrderRequestError::MismatchType)
             }
         }

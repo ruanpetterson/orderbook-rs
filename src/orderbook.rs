@@ -10,6 +10,7 @@ use indexmap::IndexMap;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
+use crate::internals::ExchangeExt;
 use crate::{Asset, Exchange, ExchangeEvent, Opposite, OrderSide};
 
 pub struct Orderbook<Order: Asset, Event, Trade> {
@@ -134,5 +135,27 @@ where
             }
         }?;
         self.orders.remove(&order_id)
+    }
+}
+
+impl<Order, Event, Trade> ExchangeExt for Orderbook<Order, Event, Trade>
+where
+    Order: Asset<OrderSide = OrderSide>,
+    Order: Asset<Trade = Trade>,
+    <Order as Asset>::OrderId: Hash,
+    Event: ExchangeEvent<Order = Order>,
+{
+    fn spread(&self) -> Option<(u64, u64)> {
+        Some((
+            self.peek(&OrderSide::Ask)?.limit_price(),
+            self.peek(&OrderSide::Bid)?.limit_price(),
+        ))
+    }
+
+    fn len(&self) -> (usize, usize) {
+        (
+            self.ask.iter().fold(0, |acc, (_, level)| acc + level.len()),
+            self.bid.iter().fold(0, |acc, (_, level)| acc + level.len()),
+        )
     }
 }

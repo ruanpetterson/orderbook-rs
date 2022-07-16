@@ -8,6 +8,7 @@ use compact_str::CompactString;
 
 use orderbook::engine::Engine;
 use orderbook::engine::OrderRequest;
+use orderbook::ExchangeExt;
 
 #[derive(Parser)]
 #[clap(author, version, about)]
@@ -50,10 +51,21 @@ fn main() -> Result<()> {
     let end = Instant::now();
 
     let elapsed = end - begin;
+    let (ask_length, bid_length) = engine.orderbook().len();
 
     eprintln!("Elapsed time: {:.2}s", elapsed.as_secs_f64());
     eprintln!("Total:        {}", i.round() as i64);
     eprintln!("Average:      {:.2} orders/s", i / elapsed.as_secs_f64());
+    eprintln!();
+    eprintln!("Orderbook infos:");
+    if let Some((ask_price, bid_price)) = engine.orderbook().spread() {
+        eprintln!("  Spread:");
+        eprintln!("    Ask: {}", ask_price);
+        eprintln!("    Bid: {}", bid_price);
+    }
+    eprintln!("  Length:");
+    eprintln!("    Ask: {}", ask_length);
+    eprintln!("    Bid: {}", bid_length);
 
     match &args.output.unwrap_or_default() {
         Output::Stdout => {
