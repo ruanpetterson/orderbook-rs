@@ -65,6 +65,9 @@ pub trait Exchange {
 pub trait ExchangeExt: Exchange {
     fn spread(&self) -> Option<(u64, u64)>;
     fn len(&self) -> (usize, usize);
+    fn is_empty(&self) -> bool {
+        self.len() == (0, 0)
+    }
 }
 
 pub trait ExchangeEvent {
