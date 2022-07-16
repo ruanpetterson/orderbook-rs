@@ -8,7 +8,7 @@ pub trait Exchange {
         order: &<Self::Order as Asset>::OrderId,
     ) -> Option<Self::Order>;
     fn matching(&mut self, order: Self::Order) -> Vec<Self::Event> {
-        let mut events = Vec::with_capacity(8);
+        let mut events = Vec::with_capacity(32);
         let mut incoming_order = order;
         while let (false, Some(top_order)) = (
             incoming_order.is_closed(),
