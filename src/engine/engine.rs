@@ -25,7 +25,7 @@ impl Engine {
             }
             OrderRequest::Delete { ref order_id } => {
                 if let Some(order) = self.orderbook.remove(&OrderId::new(
-                    u64::from_str_radix(order_id, 10).unwrap(),
+                    order_id.parse::<u64>().unwrap(),
                 )) {
                     vec![Event::Removed(order.id())]
                 } else {

@@ -42,8 +42,8 @@ impl TryFrom<OrderRequest> for Order {
                 side,
                 ..
             } => Ok(Order::new(
-                OrderId::new(u64::from_str_radix(&account_id, 10).unwrap()),
-                u64::from_str_radix(&account_id, 10).unwrap(),
+                OrderId::new(account_id.parse::<u64>().unwrap()),
+                account_id.parse::<u64>().unwrap(),
                 side,
                 limit_price.trunc().to_u64().unwrap() * 100
                     + limit_price.fract().to_u64().unwrap(),
