@@ -86,8 +86,7 @@ where
             }
         }
         .front()
-        .map(|order_id| self.orders.get(order_id))
-        .flatten()
+        .and_then(|order_id| self.orders.get(order_id))
     }
 
     #[inline]
@@ -101,8 +100,7 @@ where
             }
         }
         .front()
-        .map(|order_id| self.orders.get_mut(order_id))
-        .flatten()
+        .and_then(|order_id| self.orders.get_mut(order_id))
     }
 
     #[inline]
@@ -127,8 +125,7 @@ where
                 }
             }
         }
-        .map(|order_id| self.orders.remove(&order_id))
-        .flatten()
+        .and_then(|order_id| self.orders.remove(&order_id))
     }
 }
 
