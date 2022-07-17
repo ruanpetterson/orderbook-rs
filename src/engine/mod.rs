@@ -1,3 +1,5 @@
+//! An implementation of [`Exchange`](crate::Exchange) for simple cases.
+
 mod engine;
 pub use engine::Engine;
 
