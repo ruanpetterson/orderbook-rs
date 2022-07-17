@@ -12,7 +12,4 @@ pub use crate::internals::{
 mod order_side;
 pub use crate::order_side::OrderSide;
 
-mod orderbook;
-pub use crate::orderbook::Orderbook;
-
 pub mod engine;
