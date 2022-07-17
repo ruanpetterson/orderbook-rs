@@ -1,12 +1,22 @@
+/// An interface for dealing with exchange.
+///
+/// This is the core trait for exchange implementation.
 pub trait Exchange {
+    /// The type of order that will be stored in the exchange.
     type Order: Asset;
+    /// The type of event the exchange will generate.
     type Event: ExchangeEvent<Order = Self::Order>;
 
+    /// Inserts an order into the exchange.
     fn insert(&mut self, order: Self::Order);
+
+    /// Removes an order from the exchange.
     fn remove(
         &mut self,
         order: &<Self::Order as Asset>::OrderId,
     ) -> Option<Self::Order>;
+
+    /// Core exchange algorithm. 
     fn matching(&mut self, order: Self::Order) -> Vec<Self::Event> {
         let mut events = Vec::with_capacity(32);
         let mut incoming_order = order;
@@ -48,14 +58,20 @@ pub trait Exchange {
 
         events
     }
+
+    /// Returns a reference of the most relevant order in the exchange.
     fn peek(
         &self,
         side: &<Self::Order as Asset>::OrderSide,
     ) -> Option<&Self::Order>;
+
+    /// Returns a mutable reference of the most relevant order in the exchange.
     fn peek_mut(
         &mut self,
         side: &<Self::Order as Asset>::OrderSide,
     ) -> Option<&mut Self::Order>;
+
+    /// Removes the most relevant order in the exchange.
     fn pop(
         &mut self,
         side: &<Self::Order as Asset>::OrderSide,
