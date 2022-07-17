@@ -1,3 +1,9 @@
+//! This is a simple orderbook implementation.
+//!
+//! ## Features
+//! - Limit orders
+//! - Runs on nightly Rust
+
 #![feature(map_first_last)]
 #![feature(const_btree_new)]
 
