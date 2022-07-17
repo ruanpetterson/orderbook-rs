@@ -7,6 +7,9 @@ pub use event::Event;
 mod order;
 pub use order::{AskOrder, BidOrder, Order};
 
+mod orderbook;
+pub use orderbook::Orderbook;
+
 mod order_id;
 pub use order_id::OrderId;
 

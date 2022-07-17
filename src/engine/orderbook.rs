@@ -7,8 +7,7 @@ use std::marker::PhantomData;
 use compact_str::CompactString;
 use indexmap::IndexMap;
 
-use crate::internals::ExchangeExt;
-use crate::{Asset, Exchange, ExchangeEvent, OrderSide};
+use crate::{Asset, Exchange, ExchangeEvent, ExchangeExt, OrderSide};
 
 pub struct Orderbook<Order: Asset, Event, Trade> {
     #[allow(dead_code)]

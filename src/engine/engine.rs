@@ -1,5 +1,5 @@
-use super::{Event, Order, OrderId, OrderRequest, Trade};
-use crate::{Asset, Exchange, Orderbook};
+use super::{Event, Order, OrderId, OrderRequest, Orderbook, Trade};
+use crate::{Asset, Exchange};
 
 pub struct Engine {
     orderbook: Orderbook<Order, Event<Order>, Trade>,
@@ -24,9 +24,10 @@ impl Engine {
                 self.orderbook.matching(order)
             }
             OrderRequest::Delete { ref order_id } => {
-                if let Some(order) = self.orderbook.remove(&OrderId::new(
-                    order_id.parse::<u64>().unwrap(),
-                )) {
+                if let Some(order) = self
+                    .orderbook
+                    .remove(&OrderId::new(order_id.parse::<u64>().unwrap()))
+                {
                     vec![Event::Removed(order.id())]
                 } else {
                     vec![]
