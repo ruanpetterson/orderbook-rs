@@ -1,8 +1,8 @@
 use compact_str::CompactString;
 use once_cell::sync::Lazy;
 
-use crate::engine::{Event, Order, Trade};
-use crate::{Asset, Exchange, Orderbook};
+use crate::engine::{Event, Order, Orderbook, Trade};
+use crate::{Asset, Exchange};
 
 const PAIR: CompactString = CompactString::new_inline("BTC/USDC");
 const MOCK_SIZE: usize = 6;

@@ -8,7 +8,7 @@ mod order;
 pub use order::{AskOrder, BidOrder, Order};
 
 mod orderbook;
-pub use orderbook::Orderbook;
+pub use self::orderbook::Orderbook;
 
 mod order_id;
 pub use order_id::OrderId;
